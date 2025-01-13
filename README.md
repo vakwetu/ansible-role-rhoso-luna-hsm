@@ -16,7 +16,8 @@ role to complete successfully.
     this will be a concatenation of all the server certs for the servers in the HA partition.
   * The client certificate and key made available at luna_client_cert_src.  The files are expected
     to be of the form "(client_ip)".pem and "(client_ip)"Key.pem
-* The certs will be retrieved and stored in a secret (luna_cert_secret)
+  * The Chrystoki.conf is available at chrystoki_conf_src.
+* The certs and Chrystoki.conf will be retrieved and stored in a secret (luna_data_secret)
 * The password to log into the HSM partition will be stored in a secret (login_secret)
 
 A minimal (one that takes the defaults) invocation of this role is shown below.  In this case, the lunaclient
@@ -63,12 +64,13 @@ You can also do the steps separately.
 * `luna_binaries_src`: (String) Location of the luna binaries. Default value: `file:///opt/luna/bin`
 
 ### Secret Generation Variables
+* `chrystoki_conf_src`: (String) Location of Chrystoki.conf file. Default value: `file:///opt/luna/Chrystoki.conf`
 * `luna_server_cert_src`: (String) Location of HSM server CA cert.  Default value: `file:///opt/luna/cert/server/cacert.pem`
 * `luna_client_cert_src`: (String) Location of HSM client certs.  Default value: `file:///opt/luna/cert/client`
 * `server_ca_file`: (String) Name of the cacert file in the container.  Default value: `cacert.pem`
 * `client_ip`: (String) ip address or hostname of the client VM
-* `luna_cert_secret`: (String) Name of the secret that stores all of the needed certs for luna.  Default value: `barbican-luna-certs`
-* `luna_cert_secret_namespace`: (String) Namespace of the secret that stores all of the needed certs for luna.  Default value: `openstack`
+* `luna_data_secret`: (String) Name of the secret that stores all of the needed certs for luna.  Default value: `barbican-luna-data`
+* `luna_data_secret_namespace`: (String) Namespace of the secret that stores all of the needed certs for luna.  Default value: `openstack`
 * `login_secret`: (String) The secret to store the password to log into the HSM partition. Default: `hsm-login`
 * `partition_password`: (String) Password to log into the HSM Partition
 * `kubeconfig_path`: (String) Path to kubeconfig file
