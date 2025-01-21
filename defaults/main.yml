@@ -32,6 +32,7 @@ chrystoki_conf_src: "file:///opt/luna/Chrystoki.conf"
 server_ca_file: "cacert.pem"
 luna_data_secret: "barbican-luna-data"
 luna_data_secret_namespace: "openstack"
+login_secret_field: "PKCS11Pin"
 
 ## Image details
 barbican_src_image_registry: "quay.io"

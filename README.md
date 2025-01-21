@@ -72,6 +72,7 @@ You can also do the steps separately.
 * `luna_data_secret`: (String) Name of the secret that stores all of the needed certs for luna.  Default value: `barbican-luna-data`
 * `luna_data_secret_namespace`: (String) Namespace of the secret that stores all of the needed certs for luna.  Default value: `openstack`
 * `login_secret`: (String) The secret to store the password to log into the HSM partition. Default: `hsm-login`
+* `login_secret_field`: (String) key to store partition_password in Login_secret.  Default: `PKCS11Pin`
 * `partition_password`: (String) Password to log into the HSM Partition
 * `kubeconfig_path`: (String) Path to kubeconfig file
 * `oc_path`: (String) Path to oc binary
