@@ -39,17 +39,6 @@
         src: "{{ working_dir }}/{{ luna_minclient_src | basename }}"
         dest: "{{ working_dir }}/client/"
 
-    - name: Get the binaries
-      ansible.builtin.get_url:
-        url: "{{ luna_binaries_src }}/{{ item }}"
-        dest: "{{ working_dir }}/bin/"
-        mode: "0770"
-      loop:
-        - "vtl"
-        - "lunacm"
-        - "multitoken"
-        - "ckdemo"
-
 - name: Download build tools
   become: true
   ansible.builtin.dnf:
@@ -67,8 +56,7 @@
     BARBICAN_DEST_IMAGE_REGISTRY: "{{ barbican_dest_image_registry }}"
     BARBICAN_DEST_IMAGE_NAMESPACE: "{{ barbican_dest_image_namespace }}"
     BARBICAN_DEST_IMAGE_TAG: "{{ barbican_dest_image_tag }}"
-    LUNA_LINUX_MINIMAL_CLIENT_DIR: "{{ working_dir }}/client/linux-minimal"
-    LUNA_CLIENT_BIN: "{{ working_dir }}/bin"
+    LUNA_LINUX_MINIMAL_CLIENT_DIR: "{{ working_dir }}/client/LunaClient-Minimal-{{ luna_minclient_version }}.x86_64"
 
 - name: Perform cleanup tasks
   when:
