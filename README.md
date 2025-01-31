@@ -48,7 +48,7 @@ You can also do the steps separately.
         luna_minclient_src: "file:///opt/luna/LunaClient-Minimal-{{ luna_minclient_version }}.x86_64.tar"
        tasks:
        - name: Create new barbican images with the Luna Minimal Client
-         ansible.builtin.includ_role:
+         ansible.builtin.include_role:
            name: rhoso_luna_hsm
            tasks_from: create_image
 
