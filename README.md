@@ -17,7 +17,7 @@ role to complete successfully:
   * The HSM Appliance Server Certificate (server.pem) file is made available at luna_server_cert_src.
     When using more than one HSM appliance, this file will be a concatenation of all the server certificates.
   * The client certificate and key made available at luna_client_cert_src.  The files are expected
-    to be of the form $(CLIENT_NAME).pem and $(CLIENT_NAME)Key.pem
+    to be of the form "{{ client_name }}.pem" and "{{ client_name }}Key.pem"
   * The Chrystoki.conf is available at chrystoki_conf_src.
 * The certs and Chrystoki.conf will be retrieved from the given locations and stored in a secret (luna_data_secret)
 * The PIN (password) to log into the HSM partition will be stored in a secret (login_secret)
@@ -25,56 +25,78 @@ role to complete successfully:
 A minimal (one that takes the defaults) invocation of this role is shown below.  In this case, the Luna Minimal Client
 software and required certificates and configuration files are stored locally under /opt/luna.
 
-    - name: Set up Luna
-      ansible.builtin.include_role: rhoso_luna_hsm
+    ---
+    - hosts: localhost
       vars:
-        client_ip: "IP of the client - this could be the hypervisor where the Openshift nodes run"
-        partition_password: "password to log into partition"
-        kubeconfig_path: "path to kubeconfig file"
-        oc_path: "path to oc binary"
+        barbican_dest_image_namespace: "{{ your quay.io account name }}"
+        luna_minclient_version: "10.7.2-16"
+        luna_minclient_src: "file:///opt/luna/LunaClient-Minimal-{{ luna_minclient_version }}.x86_64.tar"
+        luna_client_name: "{{ name used for client certificate }}"
+        luna_partition_password: "{{ password to log into luna partition }}"
+        kubeconfig_path: "/path/to/.kube/config"
+        oc_dir: "/path/to/oc/bin/dir/"
+      roles:
+        - rhoso_luna_hsm
 
 You can also do the steps separately.
 
-- name: Create new barbican image with the hsm software
-  ansible.builtin.include_role: rhoso_luna_hsm
-  tasks_from: create_image.yml
+    ---
+    - hosts: localhost
+      vars:
+        barbican_dest_image_namespace: "{{ your quay.io account name }}"
+        luna_minclient_version: "10.7.2-16"
+        luna_minclient_src: "file:///opt/luna/LunaClient-Minimal-{{ luna_minclient_version }}.x86_64.tar"
+       tasks:
+       - name: Create new barbican images with the Luna Minimal Client
+         ansible.builtin.includ_role:
+           name: rhoso_luna_hsm
+           tasks_from: create_image
 
-- name: Create secrets containing the certs and partition password
-  ansible.builtin.include_role: rhoso_luna_hsm
-  tasks_from: create_secrets.yml
-  vars:
-    client_ip: "IP of the client - this could be the hypervisor where the Openshift nodes run"
-    partition_password: "password to log into partition"
-    kubeconfig_path: "path to kubeconfig file"
-    oc_path: "path to oc binary"
-
+    ---
+    - hosts: localhost
+      vars:
+        luna_client_name: "{{ name used for client certificate }}"
+        luna_partition_password: "{{ password to log into luna partition }}"
+        kubeconfig_path: "/path/to/.kube/config"
+        oc_dir: "/path/to/oc/bin/dir/"
+      tasks:
+      - name: Create secrets containing NTLS certificates and partition password
+        ansible.builtin.include_role:
+          name: rhoso_luna_hsm
+          tasks_from: create_certs
 
 ## Role Variables
 
 ### Role Parameters
-* `cleanup`: (Boolean) Delete all resources created by the role at the end of the testing. Default value: `false`
-* `working_dir`: (String) Working directory to store artifacts.  Default value: `/tmp/hsm-prep-working-dir`
+| Variable      | Type    | Default Value               | Description                                                     |
+| ------------- | ------- | --------------------------- | --------------------------------------------------------------- |
+| `cleanup`     | boolean | `false`                     | Delete all resources created by the role at the end of the run. |
+| `working_dir` | string  | `/tmp/hsm-prep-working-dir` | Working directory to store artifacts.                           |
 
 ### Image Generation Variables
-* `barbican_src_image_registry`: (String) Registry of the source image. Default value: `quay.io`
-* `barbican_src_image_namespace: (String) Namespace of the source image. Default value: `podified-antelope-centos9`
-* `barbican_src_image_tag: (String) Tag of the source image. Default value: `current-podified`
-* `barbican_dest_image_registry`: (String) Registry of the modified image. Default value: `quay.io`
-* `barbican_dest_image_namespace: (String) Namespace of the modified image. Default value: `podified-antelope-centos9`
-* `barbican_dest_image_tag: (String) Tag of the modified image. Default value: `current-podified-luna`
-* `luna_minclient_src`: (String) Location of linux minimal client tarball. Default value: `file:///opt/luna/Linux-Minimal-Client.tar.gz`
-* `luna_binaries_src`: (String) Location of the luna binaries. Default value: `file:///opt/luna/bin`
+| Variable                        | Type   | Default Value                                              | Description                                                                        |
+| ------------------------------- | ------ | ---------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `barbican_src_image_registry`   | string | `quay.io`                                                  | Registry used to pull down the Barbican images                                     |
+| `barbican_src_image_namespace`  | string | `podified-antelope-centos9`                                | Registry namespace for the Barbican images                                         |
+| `barbican_src_image_tag`        | string | `current-podified`                                         | Tag used to identify the source images                                             |
+| `barbican_dest_image_registry`  | string | `quay.io`                                                  | Registry used to push the modified images                                          |
+| `barbican_dest_image_namespace` | string | `podified-antelope-centos9`                                | Registry namespace for the modified images                                         |
+| `barbican_dest_image_tag`       | string | `current-podified-luna`                                    | Tag used to identify the modified images                                           |
+| `luna_minclient_src`            | string | `file:///opt/luna/LunaClient-Minimal-10.7.2-16.x86_64.tar` | Location of the Luna Minimal Client tarball                                        |
+| `luna_minclient_version`        | string | `10.7.2-16`                                                | Version string used to locate the directory inside the Luna Minimal Client Tarball |
 
 ### Secret Generation Variables
-* `chrystoki_conf_src`: (String) Location of Chrystoki.conf file. Default value: `file:///opt/luna/Chrystoki.conf`
-* `luna_server_cert_src`: (String) Location of HSM server CA cert.  Default value: `file:///opt/luna/cert/server/cacert.pem`
-* `luna_client_cert_src`: (String) Location of HSM client certs.  Default value: `file:///opt/luna/cert/client`
-* `server_ca_file`: (String) Name of the cacert file in the container.  Default value: `cacert.pem`
-* `client_ip`: (String) ip address or hostname of the client VM
-* `luna_data_secret`: (String) Name of the secret that stores all of the needed certs for luna.  Default value: `barbican-luna-data`
-* `luna_data_secret_namespace`: (String) Namespace of the secret that stores all of the needed certs for luna.  Default value: `openstack`
-* `login_secret`: (String) The secret to store the password to log into the HSM partition. Default: `hsm-login`
-* `login_secret_field`: (String) key to store partition_password in Login_secret.  Default: `PKCS11Pin`
-* `partition_password`: (String) Password to log into the HSM Partition
-* `kubeconfig_path`: (String) Path to kubeconfig file
-* `oc_path`: (String) Path to oc binary
+| Variable                     | Type   | Default Value                             | Description                                                                                   |
+| ---------------------------- | ------ | ----------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `kubeconfig_path`            | string | None                                      | Full path to kubeconfig file. e.g. `/home/user/.kube/config`                                  |
+| `oc_dir`                     | string | None                                      | Full path to the directory containing the `oc` command binary. e.g. `/home/user/.crc/bin/oc/` |
+| `luna_client_name`           | string | None                                      | Name of the client certificate.  This must match the certificate and key file names           |
+| `luna_partition_password`    | string | None                                      | Password (SO PIN) used to log into the HSM partition                                          |
+| `chrystoki_conf_src`         | string | `file:///opt/luna/Chrystoki.conf`         | Full path to the Chrystoki.conf file                                                          |
+| `luna_server_cert_src`       | string | `file:///opt/luna/cert/server/server.pem` | Full path to the HSM server certificate                                                       |
+| `luna_client_cert_src`       | string | `file:///opt/luna/cert/client`            | Directory path to the directory containing the client certificate and key                     |
+| `server_ca_file`             | string | `CAFile.pem`                              | Name to be used for the server certificate once mounted on the container                      |
+| `luna_data_secret`           | string | `barbican-luna-data`                      | Name of the secret used to store client and server certificates                               |
+| `luna_data_secret_namespace` | string | `openstack`                               | Namespace to be used when creating `luna_data_secret`                                         |
+| `login_secret`               | string | `hsm-login`                               | Name of the secret used to store the password to log into the HSM partition                   |
+| `login_secret_field`         | string | `PKCS11Pin`                               | Secret key used to store the `luna_partition_password` data in `login_secret`                 |
