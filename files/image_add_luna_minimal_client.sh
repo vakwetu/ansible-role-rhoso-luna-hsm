@@ -26,13 +26,15 @@ BARBICAN_DEST_WORKER_IMAGE="$BARBICAN_DEST_IMAGE_REGISTRY/$BARBICAN_DEST_IMAGE_N
 # the location where a tarball was extracted
 LUNA_LINUX_MINIMAL_CLIENT_DIR=${LUNA_LINUX_MINIMAL_CLIENT_DIR:-"/media/lunaiso/linux-minimal"}
 
-# LUNA_CLIENT_BIN - location of the binaries installed by the client
-# software.
-LUNA_CLIENT_BIN=${LUNA_CLIENT_BIN:-"/usr/safenet/lunaclient/bin"}
+VERIFY_TLS=${VERIFY_TLS:-"true"}
 
 function install_client() {
 
-  container=$(buildah from --tls-verify=false $1)
+  if [ "$VERIFY_TLS" == "true" ]; then
+    container=$(buildah from $1)
+  else
+    container=$(buildah from --tls-verify=false $1)
+  fi
 
   # set required env
   buildah config --env ChrystokiConfigurationPath=/usr/local/luna $container
@@ -42,13 +44,14 @@ function install_client() {
   buildah run --user root $container -- mkdir -p /usr/local/luna/config/certs
   buildah run --user root $container -- mkdir -p /usr/local/luna/config/token/001
   buildah run --user root $container -- touch /usr/local/luna/config/token/001/token.db
-  buildah add --chown root:root $container $LUNA_CLIENT_BIN/lunacm /usr/local/bin/
-  buildah add --chown root:root $container $LUNA_CLIENT_BIN/vtl /usr/local/bin/
-  buildah add --chown root:root $container $LUNA_CLIENT_BIN/multitoken /usr/local/bin/
-  buildah add --chown root:root $container $LUNA_CLIENT_BIN/ckdemo /usr/local/bin/
 
-  buildah commit --tls-verify=false $container $2
-  podman push --tls-verify=false $2
+  if [ "$VERIFY_TLS" == "true" ]; then
+    buildah commit $container $2
+    podman push $2
+  else
+    buildah commit --tls-verify=false $container $2
+    podman push --tls-verify=false $2
+  fi
   buildah rm $container
 }
 

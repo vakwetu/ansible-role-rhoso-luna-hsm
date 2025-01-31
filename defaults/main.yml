@@ -16,25 +16,24 @@
 
 # defaults file for the ansible-role-rhoso-luna-hsm role
 
-# HSM Details
-login_secret: "hsm-login"
-
 ### Role Parameters
 cleanup: false
 working_dir: "/tmp/hsm-prep-working-dir"
 
 ### Luna Parameters
-luna_minclient_src: "file:///opt/luna/Linux-Minimal-Client.tar.gz"
-luna_binaries_src: "file:///opt/luna/bin/"
-luna_server_cert_src: "file:///opt/luna/cert/server/cacert.pem"
+luna_minclient_src: "file:///opt/luna/LunaClient-Minimal-10.7.2-16.x86_64.tar"
+luna_minclient_version: "10.7.2-16"
+luna_server_cert_src: "file:///opt/luna/cert/server/server.pem"
 luna_client_cert_src: "file:///opt/luna/cert/client/"
+luna_client_name: "barbican"
 chrystoki_conf_src: "file:///opt/luna/Chrystoki.conf"
-server_ca_file: "cacert.pem"
+server_ca_file: "CAFile.pem"
 luna_data_secret: "barbican-luna-data"
 luna_data_secret_namespace: "openstack"
+login_secret: "hsm-login"
 login_secret_field: "PKCS11Pin"
 
-## Image details
+### Image details
 barbican_src_image_registry: "quay.io"
 barbican_src_image_namespace: "podified-antelope-centos9"
 barbican_src_image_tag: "current-podified"
