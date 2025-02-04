@@ -37,7 +37,7 @@ function install_client() {
   fi
 
   # set required env
-  buildah config --env ChrystokiConfigurationPath=/usr/local/luna $container
+  buildah config --env ChrystokiConfigurationPath=/usr/local/luna/config $container
 
   # add linux-minimal client
   buildah add --chown root:root $container $LUNA_LINUX_MINIMAL_CLIENT_DIR /usr/local/luna

@@ -29,8 +29,8 @@ software and required certificates and configuration files are stored locally un
     - hosts: localhost
       vars:
         barbican_dest_image_namespace: "{{ your quay.io account name }}"
-        luna_minclient_version: "10.7.2-16"
-        luna_minclient_src: "file:///opt/luna/LunaClient-Minimal-{{ luna_minclient_version }}.x86_64.tar"
+        luna_minclient_dir: "LunaClient-Minimal-10.7.2-16.x86_64"
+        luna_minclient_src: "file:///opt/luna/{{ luna_minclient_dir }}.tar"
         luna_client_name: "{{ name used for client certificate }}"
         luna_partition_password: "{{ password to log into luna partition }}"
         kubeconfig_path: "/path/to/.kube/config"
@@ -44,8 +44,8 @@ You can also do the steps separately.
     - hosts: localhost
       vars:
         barbican_dest_image_namespace: "{{ your quay.io account name }}"
-        luna_minclient_version: "10.7.2-16"
-        luna_minclient_src: "file:///opt/luna/LunaClient-Minimal-{{ luna_minclient_version }}.x86_64.tar"
+        luna_minclient_dir: "LunaClient-Minimal-10.7.2-16.x86_64"
+        luna_minclient_src: "file:///opt/luna/{{ luna_minclient_dir }}.tar"
        tasks:
        - name: Create new barbican images with the Luna Minimal Client
          ansible.builtin.include_role:
@@ -74,16 +74,16 @@ You can also do the steps separately.
 | `working_dir` | string  | `/tmp/hsm-prep-working-dir` | Working directory to store artifacts.                           |
 
 ### Image Generation Variables
-| Variable                        | Type   | Default Value                                              | Description                                                                        |
-| ------------------------------- | ------ | ---------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `barbican_src_image_registry`   | string | `quay.io`                                                  | Registry used to pull down the Barbican images                                     |
-| `barbican_src_image_namespace`  | string | `podified-antelope-centos9`                                | Registry namespace for the Barbican images                                         |
-| `barbican_src_image_tag`        | string | `current-podified`                                         | Tag used to identify the source images                                             |
-| `barbican_dest_image_registry`  | string | `quay.io`                                                  | Registry used to push the modified images                                          |
-| `barbican_dest_image_namespace` | string | `podified-antelope-centos9`                                | Registry namespace for the modified images                                         |
-| `barbican_dest_image_tag`       | string | `current-podified-luna`                                    | Tag used to identify the modified images                                           |
-| `luna_minclient_src`            | string | `file:///opt/luna/LunaClient-Minimal-10.7.2-16.x86_64.tar` | Location of the Luna Minimal Client tarball                                        |
-| `luna_minclient_version`        | string | `10.7.2-16`                                                | Version string used to locate the directory inside the Luna Minimal Client Tarball |
+| Variable                        | Type   | Default Value                                              | Description                                                 |
+| ------------------------------- | ------ | ---------------------------------------------------------- | ----------------------------------------------------------- |
+| `barbican_src_image_registry`   | string | `quay.io`                                                  | Registry used to pull down the Barbican images              |
+| `barbican_src_image_namespace`  | string | `podified-antelope-centos9`                                | Registry namespace for the Barbican images                  |
+| `barbican_src_image_tag`        | string | `current-podified`                                         | Tag used to identify the source images                      |
+| `barbican_dest_image_registry`  | string | `quay.io`                                                  | Registry used to push the modified images                   |
+| `barbican_dest_image_namespace` | string | `podified-antelope-centos9`                                | Registry namespace for the modified images                  |
+| `barbican_dest_image_tag`       | string | `current-podified-luna`                                    | Tag used to identify the modified images                    |
+| `luna_minclient_src`            | string | `file:///opt/luna/LunaClient-Minimal-10.7.2-16.x86_64.tar` | Location of the Luna Minimal Client tarball                 |
+| `luna_minclient_dir`            | string | `LunaClient-Minimal-10.7.2-16.x86_64`                      | Top level directory inside the Linux Minimal Client tarball |
 
 ### Secret Generation Variables
 | Variable                     | Type   | Default Value                             | Description                                                                                   |
