@@ -57,6 +57,7 @@
     BARBICAN_DEST_IMAGE_NAMESPACE: "{{ barbican_dest_image_namespace }}"
     BARBICAN_DEST_IMAGE_TAG: "{{ barbican_dest_image_tag }}"
     LUNA_LINUX_MINIMAL_CLIENT_DIR: "{{ working_dir }}/client/{{ luna_minclient_dir }}"
+    VERIFY_TLS: "{{ image_registry_verify_tls }}"
 
 - name: Perform cleanup tasks
   when:
