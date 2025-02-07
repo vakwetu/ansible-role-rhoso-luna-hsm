@@ -21,8 +21,7 @@ cleanup: false
 working_dir: "/tmp/hsm-prep-working-dir"
 
 ### Luna Parameters
-luna_minclient_dir: "LunaClient-Minimal-10.7.2-16.x86_64"
-luna_minclient_src: "file:///opt/luna/{{ luna_minclient_dir }}.tar"
+luna_minclient_src: "file:///opt/luna/LunaClient-Minimal-10.7.2-16.x86_64.tar"
 luna_server_cert_src: "file:///opt/luna/cert/server/server.pem"
 luna_client_cert_src: "file:///opt/luna/cert/client/"
 luna_client_name: "barbican"
